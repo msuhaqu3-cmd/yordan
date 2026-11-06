@@ -61,4 +61,22 @@
     <image:image><image:loc>https://www.yordandecorationsandbuilding.com/images/gallery/30-team-workwear-back.webp</image:loc><image:caption>Yordan Decorations &amp; Building Ltd branded team workwear with phone number</image:caption></image:image>
     <image:image><image:loc>https://www.yordandecorationsandbuilding.com/images/gallery/31-team-workwear-front.webp</image:loc><image:caption>Yordan Decorations &amp; Building Ltd branded team workwear</image:caption></image:image>
   </url>
+  <url>
+    <loc>https://www.yordandecorationsandbuilding.com/privacy-policy.html</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.yordandecorationsandbuilding.com/cookie-policy.html</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.yordandecorationsandbuilding.com/terms.html</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>
