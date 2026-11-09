@@ -196,3 +196,8 @@ h2{font-size:clamp(30px,9vw,44px)}.stm{font-size:clamp(22px,7vw,40px);overflow-w
 .ins svg{vertical-align:-3px;color:var(--g)}
 @media(min-width:861px){.ins-bg{align-items:center}}
 #install-app[hidden]{display:none!important}
+/* Floating "Download App" pill, bottom-left, stacked above the WhatsApp button. Only rendered when installable. */
+.ins-fab{position:fixed;left:20px;bottom:calc(90px + env(safe-area-inset-bottom,0));z-index:90;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid var(--g);border-radius:999px;background:var(--g);color:var(--k);font:600 12px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 30px #0009;transition:transform .3s,box-shadow .3s}
+.ins-fab:hover{transform:translateY(-2px);box-shadow:0 12px 36px #b89a5e55}
+.ins-fab:focus-visible{outline:2px solid var(--iv);outline-offset:3px}
+@media(max-width:860px){.ins-fab{left:14px;bottom:calc(140px + env(safe-area-inset-bottom,0))}}

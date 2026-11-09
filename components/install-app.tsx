@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type InstallEvent = Event & {
   prompt: () => Promise<void>;
@@ -27,14 +27,22 @@ function isIosSafari() {
  */
 export default function InstallApp() {
   const [sheet, setSheet] = useState(false);
+  const [can, setCan] = useState(false);
+  const act = useRef<() => void>(() => {});
 
   useEffect(() => {
     const link = document.getElementById("install-app") as HTMLAnchorElement | null;
     if (!link || isStandalone()) return;
 
     let deferred: InstallEvent | null = null;
-    const show = () => link.removeAttribute("hidden");
-    const hide = () => link.setAttribute("hidden", "");
+    const show = () => {
+      link.removeAttribute("hidden");
+      setCan(true);
+    };
+    const hide = () => {
+      link.setAttribute("hidden", "");
+      setCan(false);
+    };
 
     const onPrompt = (e: Event) => {
       e.preventDefault();
@@ -46,8 +54,7 @@ export default function InstallApp() {
       hide();
       setSheet(false);
     };
-    const onClick = async (e: Event) => {
-      e.preventDefault();
+    const run = async () => {
       if (deferred) {
         const d = deferred;
         deferred = null;
@@ -62,6 +69,12 @@ export default function InstallApp() {
         setSheet(true);
       }
     };
+
+    const onClick = (e: Event) => {
+      e.preventDefault();
+      run();
+    };
+    act.current = run;
 
     const { ios, safari } = isIosSafari();
     if (ios && safari) show();
@@ -83,9 +96,24 @@ export default function InstallApp() {
     return () => window.removeEventListener("keydown", onKey);
   }, [sheet]);
 
-  if (!sheet) return null;
   return (
-    <div className="ins-bg" role="presentation" onClick={() => setSheet(false)}>
+    <>
+      {can && (
+        <button type="button" className="ins-fab" onClick={() => act.current()} aria-label="Download our app">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Download App
+        </button>
+      )}
+      {sheet && <IosSheet onClose={() => setSheet(false)} />}
+    </>
+  );
+}
+
+function IosSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="ins-bg" role="presentation" onClick={() => onClose()}>
       <div
         className="ins"
         role="dialog"
@@ -116,7 +144,7 @@ export default function InstallApp() {
             Tap <b>Add</b>. The app icon will appear on your home screen.
           </li>
         </ol>
-        <button type="button" className="btn" onClick={() => setSheet(false)}>
+        <button type="button" className="btn" onClick={() => onClose()}>
           Got it
         </button>
       </div>
