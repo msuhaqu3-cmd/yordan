@@ -28,6 +28,7 @@ function isIosSafari() {
 export default function InstallApp() {
   const [sheet, setSheet] = useState(false);
   const [can, setCan] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android">("ios");
   const act = useRef<() => void>(() => {});
 
   useEffect(() => {
@@ -77,7 +78,15 @@ export default function InstallApp() {
     act.current = run;
 
     const { ios, safari } = isIosSafari();
-    if (ios && safari) show();
+    if (ios && safari) {
+      setPlatform("ios");
+      show();
+    } else if (/Android/i.test(navigator.userAgent)) {
+      // Android: show the button even if Chrome has not fired the install event yet
+      // (e.g. preview/protected deployments, or it was dismissed recently); fall back to menu instructions.
+      setPlatform("android");
+      show();
+    }
 
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("appinstalled", onInstalled);
@@ -106,12 +115,34 @@ export default function InstallApp() {
           Download App
         </button>
       )}
-      {sheet && <IosSheet onClose={() => setSheet(false)} />}
+      {sheet && <InstallSheet platform={platform} onClose={() => setSheet(false)} />}
     </>
   );
 }
 
-function IosSheet({ onClose }: { onClose: () => void }) {
+function InstallSheet({ platform, onClose }: { platform: "ios" | "android"; onClose: () => void }) {
+  if (platform === "android")
+    return (
+      <div className="ins-bg" role="presentation" onClick={() => onClose()}>
+        <div className="ins" role="dialog" aria-modal="true" aria-labelledby="ins-t" onClick={(e) => e.stopPropagation()}>
+          <h3 id="ins-t">Install Yordan on your phone</h3>
+          <ol>
+            <li>
+              Open the browser menu <b>&#8942;</b> (top right) in Chrome.
+            </li>
+            <li>
+              Tap <b>Install app</b> (or <b>Add to Home screen</b>).
+            </li>
+            <li>
+              Tap <b>Install</b>. The app icon will appear on your home screen.
+            </li>
+          </ol>
+          <button type="button" className="btn" onClick={() => onClose()}>
+            Got it
+          </button>
+        </div>
+      </div>
+    );
   return (
     <div className="ins-bg" role="presentation" onClick={() => onClose()}>
       <div
