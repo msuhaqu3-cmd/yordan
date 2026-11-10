@@ -200,4 +200,19 @@ h2{font-size:clamp(30px,9vw,44px)}.stm{font-size:clamp(22px,7vw,40px);overflow-w
 .ins-fab{position:fixed;left:20px;bottom:calc(90px + env(safe-area-inset-bottom,0));z-index:90;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid var(--g);border-radius:999px;background:var(--g);color:var(--k);font:600 12px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 30px #0009;transition:transform .3s,box-shadow .3s}
 .ins-fab:hover{transform:translateY(-2px);box-shadow:0 12px 36px #b89a5e55}
 .ins-fab:focus-visible{outline:2px solid var(--iv);outline-offset:3px}
-@media(max-width:860px){.ins-fab{left:14px;bottom:calc(140px + env(safe-area-inset-bottom,0))}}
+
+
+/* ===== Mobile floating actions: tidy, non-overlapping layout =====
+   Bottom bar stays. Left: app download pill. Right: one column of two round buttons (Ask Yordan, WhatsApp). */
+@media(max-width:860px){
+  #ai{right:max(14px,env(safe-area-inset-right));bottom:calc(80px + env(safe-area-inset-bottom,0));z-index:95}
+  #aib{width:50px;height:50px;padding:0;border-radius:50%;font-size:0;letter-spacing:0;box-shadow:0 8px 24px #0009;
+    background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b0b0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.8L3 21l1.9-5.4A8.4 8.4 0 1 1 21 11.5z'/%3E%3C/svg%3E") center/23px no-repeat}
+  .wa{left:auto;right:max(14px,env(safe-area-inset-right));bottom:calc(142px + env(safe-area-inset-bottom,0));width:50px;height:50px;box-shadow:0 8px 24px #0009}
+  .wa svg{width:26px;height:26px}
+  .ins-fab{left:max(14px,env(safe-area-inset-left));bottom:calc(80px + env(safe-area-inset-bottom,0));height:40px;padding:0 15px;font-size:11px;letter-spacing:.1em;box-shadow:0 8px 24px #0009}
+  .ins-fab.c{width:40px;padding:0;justify-content:center}
+  .ins-fab.c .ins-l{display:none}
+  /* while the assistant is open, hide the other floating buttons so nothing overlaps it */
+  body:has(#ap.o) .wa,body:has(#ap.o) .ins-fab{display:none}
+}

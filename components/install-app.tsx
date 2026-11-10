@@ -28,6 +28,7 @@ function isIosSafari() {
 export default function InstallApp() {
   const [sheet, setSheet] = useState(false);
   const [can, setCan] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [platform, setPlatform] = useState<"ios" | "android">("ios");
   const act = useRef<() => void>(() => {});
 
@@ -99,6 +100,14 @@ export default function InstallApp() {
   }, []);
 
   useEffect(() => {
+    // Collapse the pill to a round icon once the visitor scrolls, so it stays out of the way.
+    const onScroll = () => setCompact(window.scrollY > 320);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     if (!sheet) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSheet(false);
     window.addEventListener("keydown", onKey);
@@ -108,11 +117,11 @@ export default function InstallApp() {
   return (
     <>
       {can && (
-        <button type="button" className="ins-fab" onClick={() => act.current()} aria-label="Download our mobile app">
+        <button type="button" className={compact ? "ins-fab c" : "ins-fab"} onClick={() => act.current()} aria-label="Download our mobile app">
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Download Mobile App
+          <span className="ins-l">Download App</span>
         </button>
       )}
       {sheet && <InstallSheet platform={platform} onClose={() => setSheet(false)} />}
