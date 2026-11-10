@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { STATUSES, getEnquiry } from "@/lib/enquiries";
+import { SOURCE_LABEL, STATUSES, getEnquiry } from "@/lib/enquiries";
 import { parsePhone } from "@/lib/settings";
 import { fmtDateTime, toLondonInput } from "@/lib/time";
 import ActionForm from "@/components/admin/action-form";
@@ -22,7 +22,7 @@ export default async function EnquiryPage({ params }: { params: Promise<{ id: st
     <>
       <p style={{ margin: "0 0 12px" }}><Link href="/admin/enquiries">← All enquiries</Link></p>
       <h1>{e.name}</h1>
-      <p className="sub">Received {fmtDateTime(e.created_at)} · <span className={`badge b-${e.source}`}>{e.source}</span> · <span className={`badge b-${e.status}`}>{e.status}</span></p>
+      <p className="sub">Received {fmtDateTime(e.created_at)} · <span className={`badge b-${e.source}`}>{SOURCE_LABEL[e.source]}</span> · <span className={`badge b-${e.status}`}>{e.status}</span>{e.email_status === "failed" && <> · <span className="warn">Email copy not sent</span></>}</p>
       <div className="grid two">
         <div className="card">
           <h2>Request</h2>

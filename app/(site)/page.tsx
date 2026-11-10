@@ -15,7 +15,7 @@ export default async function HomePage() {
       {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
       {/* display:contents keeps the DOM layout identical to the original static page */}
       <div style={{ display: "contents" }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />
-      <script dangerouslySetInnerHTML={{ __html: clientConfig(d) }} />
+      <script dangerouslySetInnerHTML={{ __html: clientConfig(d, "site") }} />
       <HomeBehaviour />
     </>
   );

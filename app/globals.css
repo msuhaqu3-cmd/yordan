@@ -216,3 +216,16 @@ h2{font-size:clamp(30px,9vw,44px)}.stm{font-size:clamp(22px,7vw,40px);overflow-w
   /* while the assistant is open, hide the other floating buttons so nothing overlaps it */
   body:has(#ap.o) .wa,body:has(#ap.o) .ins-fab{display:none}
 }
+/* ===== Mobile: the bottom "Get a quote / Emergency" bar stays out of the first (hero) section and slides in once the
+   second section starts. Floating buttons sit in the corners until then, and ride above the bar afterwards. ===== */
+@media(max-width:860px){
+  .mb{transform:translateY(110%);visibility:hidden;transition:transform .35s ease,visibility 0s .35s}
+  body.pgd .mb{transform:none;visibility:visible;transition:transform .35s ease}
+  #ai,.wa,.ins-fab{transition:bottom .35s ease,opacity .2s,transform .2s}
+  #ai{bottom:calc(18px + env(safe-area-inset-bottom,0))}
+  .wa{bottom:calc(80px + env(safe-area-inset-bottom,0))}
+  .ins-fab{bottom:calc(22px + env(safe-area-inset-bottom,0))}
+  body.pgd #ai{bottom:calc(80px + env(safe-area-inset-bottom,0))}
+  body.pgd .wa{bottom:calc(142px + env(safe-area-inset-bottom,0))}
+  body.pgd .ins-fab{bottom:calc(80px + env(safe-area-inset-bottom,0))}
+}

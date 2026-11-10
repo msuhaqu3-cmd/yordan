@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { q } from "@/lib/db";
-import { STATUSES, listEnquiries, statusCounts, type Enquiry } from "@/lib/enquiries";
+import { SOURCE_LABEL, STATUSES, listEnquiries, statusCounts, type Enquiry } from "@/lib/enquiries";
 import { fmtDateTime } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ export default async function Dashboard() {
             <div className="tw"><table><tbody>
               {recent.map((e) => (
                 <tr key={e.id}>
-                  <td><Link className="row" href={`/admin/enquiries/${e.id}`}>{e.name}</Link><br /><small style={{ color: "var(--muted)" }}>{e.service || "—"} · {fmtDateTime(e.created_at)}</small></td>
+                  <td><Link className="row" href={`/admin/enquiries/${e.id}`}>{e.name}</Link><br /><small style={{ color: "var(--muted)" }}>{e.service || "—"} · {SOURCE_LABEL[e.source]} · {fmtDateTime(e.created_at)}</small></td>
                   <td style={{ textAlign: "right" }}><span className={`badge b-${e.status}`}>{e.status}</span></td>
                 </tr>
               ))}

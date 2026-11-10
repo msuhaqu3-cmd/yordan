@@ -64,7 +64,9 @@ export function mediaCss(media: Record<string, string>): string {
 }
 
 /** JSON for window.__SITE__ (escaped so it can never close the script tag). */
-export function clientConfig(d: SiteData): string {
-  const cfg = { phone: d.vars.PHONE, phoneSpaced: d.vars.PHONE_SPACED, tel: d.vars.TEL, wa: d.vars.WA, email: d.vars.EMAIL, media: d.appMedia };
+/** Each page only receives what its own script needs: the website gets no app-media links and vice versa. */
+export function clientConfig(d: SiteData, page: "site" | "app"): string {
+  const cfg: Record<string, unknown> = { phone: d.vars.PHONE, phoneSpaced: d.vars.PHONE_SPACED, tel: d.vars.TEL, wa: d.vars.WA, email: d.vars.EMAIL };
+  if (page === "app") cfg.media = d.appMedia;
   return "window.__SITE__=" + JSON.stringify(cfg).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/\u2028|\u2029/g, "");
 }

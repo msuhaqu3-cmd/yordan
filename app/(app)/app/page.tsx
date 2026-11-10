@@ -11,7 +11,7 @@ export default async function AppPage() {
   return (
     <>
       <div style={{ display: "contents" }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />
-      <script dangerouslySetInnerHTML={{ __html: clientConfig(d) }} />
+      <script dangerouslySetInnerHTML={{ __html: clientConfig(d, "app") }} />
       <AppBehaviour />
     </>
   );

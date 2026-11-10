@@ -10,6 +10,7 @@ export type Enquiry = {
   service: string | null; property_type: string | null; timing: string | null; postcode: string | null; details: string | null;
   name: string; phone: string; email: string | null; status: Status;
   appointment_at: string | null; notes: string; updated_at: string; updated_by: string | null;
+  email_status: "sent" | "failed" | null;
 };
 
 const clean = (v: unknown, max: number) =>
@@ -43,6 +44,14 @@ export async function createEnquiry(e: NewEnquiry) {
     [e.ref, e.source, e.service, e.property_type, e.timing, e.postcode, e.details, e.name, e.phone, e.email || null],
   );
 }
+
+/** Website forms report whether the FormSubmit e-mail went out, so the team can spot a failed delivery. */
+export async function setEmailStatus(ref: string, status: unknown) {
+  if ((status !== "sent" && status !== "failed") || !/^[A-Za-z0-9_-]{8,64}$/.test(ref)) return;
+  await q("update enquiries set email_status=$2 where ref=$1 and source='website' and email_status is null", [ref, status]);
+}
+
+export const SOURCE_LABEL: Record<string, string> = { website: "Website", app: "Mobile app" };
 
 export type Filters = { status?: string; source?: string; search?: string; page?: number };
 export const PAGE_SIZE = 25;

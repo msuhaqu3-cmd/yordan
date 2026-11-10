@@ -43,19 +43,29 @@ export default function MediaSlot({ slot, label, hint, current, custom, resetAct
   }
 
   const shown = preview || current;
+  const isCustom = custom || !!preview;
+  const [over, setOver] = useState(false);
   return (
-    <div className="slot">
-      <div className="thumb">{shown ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={shown} alt={label} loading="lazy" /> : <span>No photo yet<br /><small>placeholder in use</small></span>}</div>
+    <div className={`slot${isCustom ? " is-custom" : ""}`}>
+      <button
+        type="button" className={`thumb${over ? " over" : ""}`} disabled={busy} aria-label={`${shown ? "Replace" : "Upload"} photo: ${label}`}
+        onClick={() => input.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)}
+        onDrop={(e) => { e.preventDefault(); setOver(false); onFile(e.dataTransfer.files?.[0]); }}
+      >
+        {shown ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={shown} alt="" loading="lazy" decoding="async" /> : <span className="ph-t">No photo yet<small>Placeholder in use</small></span>}
+        <span className="ov">{busy ? "Uploading…" : shown ? "Replace photo" : "Upload photo"}</span>
+      </button>
       <div className="slot-b">
-        <b title={label}>{label}</b>
-        <small>{custom || preview ? "Custom photo" : current ? "Original photo" : "Placeholder"}{hint ? ` · ${hint}` : ""}</small>
+        <div className="slot-t"><b title={label}>{label}</b>{isCustom && <span className="chip">Replaced</span>}</div>
+        {hint && <small>{hint}</small>}
+        <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => onFile(e.target.files?.[0])} />
         <div className="slot-a">
-          <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => onFile(e.target.files?.[0])} />
-          <button type="button" className="btn small" disabled={busy} onClick={() => input.current?.click()}>{busy ? "Uploading…" : shown ? "Replace" : "Upload"}</button>
-          {(custom || preview) && (
+          <button type="button" className="btn small ghost" disabled={busy} onClick={() => input.current?.click()}>{busy ? "Uploading…" : shown ? "Replace" : "Upload"}</button>
+          {isCustom && (
             <form action={resetAction} onSubmit={(e) => { if (!window.confirm("Go back to the original image?")) e.preventDefault(); }}>
               <input type="hidden" name="slot" value={slot} />
-              <button className="btn small ghost">Reset</button>
+              <button className="btn small link">Reset</button>
             </form>
           )}
         </div>

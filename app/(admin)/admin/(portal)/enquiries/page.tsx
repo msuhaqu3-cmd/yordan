@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { STATUSES, listEnquiries } from "@/lib/enquiries";
+import { SOURCE_LABEL, STATUSES, listEnquiries } from "@/lib/enquiries";
 import { fmtDateTime } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +42,7 @@ export default async function Enquiries({ searchParams }: { searchParams: SP }) 
                   <td style={{ whiteSpace: "nowrap" }}>{fmtDateTime(e.created_at)}</td>
                   <td><Link className="row" href={`/admin/enquiries/${e.id}`}>{e.name}</Link><br /><small style={{ color: "var(--muted)" }}>{e.phone}</small></td>
                   <td>{e.service || "—"}</td><td>{e.postcode || "—"}</td>
-                  <td><span className={`badge b-${e.source}`}>{e.source}</span></td>
+                  <td><span className={`badge b-${e.source}`}>{SOURCE_LABEL[e.source]}</span>{e.email_status === "failed" && <><br /><small className="warn" title="The e-mail copy of this enquiry did not go through. The enquiry is safe here.">Email not sent</small></>}</td>
                   <td><span className={`badge b-${e.status}`}>{e.status}</span></td>
                 </tr>
               ))}
