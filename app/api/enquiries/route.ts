@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   if (b && typeof b === "object" && b.email_status !== undefined) {
     try {
       if (await allow(`enqs:${hashKey(await clientIp())}`, 20, 600)) await setEmailStatus(String(b.ref ?? ""), b.email_status);
-    } catch (err) { console.error("email status failed", err); }
+    } catch (err) { console.error("email status failed", (err as Error)?.message); }
     return NextResponse.json({ ok: true }, { headers: H });
   }
   const e = parseEnquiry(body);
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     if (!(await allow(`enq:${hashKey(await clientIp())}`, 10, 600))) return NextResponse.json({ ok: false }, { status: 429 });
     await createEnquiry(e);
   } catch (err) {
-    console.error("enquiry record failed", err);
+    console.error("enquiry record failed", (err as Error)?.message);
     return NextResponse.json({ ok: false }, { status: 503, headers: H });
   }
   return NextResponse.json({ ok: true, stored: true }, { headers: H });

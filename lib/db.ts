@@ -69,6 +69,8 @@ create table if not exists enquiries(
 );
 alter table enquiries add column if not exists email_status text check (email_status in ('sent','failed'));
 create index if not exists enquiries_status_created on enquiries(status, created_at desc);
+create index if not exists enquiries_created on enquiries(created_at desc);
+create index if not exists enquiries_appt on enquiries(appointment_at) where status = 'confirmed';
 create table if not exists enquiry_events(
   id bigserial primary key, enquiry_id bigint not null references enquiries(id) on delete cascade,
   at timestamptz not null default now(), user_id uuid, kind text not null, detail text

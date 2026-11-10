@@ -50,7 +50,7 @@ export const clearFails = (key: string) => q("delete from login_attempts where k
 
 /** Sliding-window limiter for public endpoints. Returns true when the request is allowed. */
 export async function allow(key: string, max: number, windowSec: number): Promise<boolean> {
-  await q("delete from rate_events where at < now() - interval '1 day'");
+  if (Math.random() < 0.05) await q("delete from rate_events where at < now() - interval '1 day'"); // housekeeping, not on every request
   const [r] = await q<{ n: number }>(
     "select count(*)::int as n from rate_events where key=$1 and at > now() - make_interval(secs => $2::float8)",
     [key, windowSec],

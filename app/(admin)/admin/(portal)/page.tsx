@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { q } from "@/lib/db";
-import { SOURCE_LABEL, STATUSES, listEnquiries, statusCounts, type Enquiry } from "@/lib/enquiries";
+import { SOURCE_LABEL, STATUSES, listEnquiries, statusCounts, ROW_COLS, type EnquiryRow } from "@/lib/enquiries";
 import { fmtDateTime } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export default async function Dashboard() {
   const [counts, recent, upcoming] = await Promise.all([
     statusCounts(),
     listEnquiries({ page: 1 }).then((r) => r.rows.slice(0, 8)),
-    q<Enquiry>("select * from enquiries where status='confirmed' and appointment_at >= now() order by appointment_at limit 6"),
+    q<EnquiryRow>(`select ${ROW_COLS} from enquiries where status='confirmed' and appointment_at >= now() order by appointment_at limit 6`),
   ]);
   return (
     <>

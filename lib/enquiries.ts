@@ -53,6 +53,10 @@ export async function setEmailStatus(ref: string, status: unknown) {
 
 export const SOURCE_LABEL: Record<string, string> = { website: "Website", app: "Mobile app" };
 
+export type EnquiryRow = Pick<Enquiry, "id" | "source" | "created_at" | "service" | "postcode" | "name" | "phone" | "status" | "appointment_at" | "email_status">;
+/** Only what the list and dashboard screens show: no job details, notes or e-mail address. */
+export const ROW_COLS = "id,source,created_at,service,postcode,name,phone,status,appointment_at,email_status";
+
 export type Filters = { status?: string; source?: string; search?: string; page?: number };
 export const PAGE_SIZE = 25;
 
@@ -67,7 +71,7 @@ export async function listEnquiries(f: Filters) {
   const w = where.length ? "where " + where.join(" and ") : "";
   const [{ n }] = await q<{ n: number }>(`select count(*)::int as n from enquiries ${w}`, p);
   const page = Math.max(1, f.page || 1);
-  const rows = await q<Enquiry>(`select * from enquiries ${w} order by created_at desc limit ${PAGE_SIZE} offset ${(page - 1) * PAGE_SIZE}`, p);
+  const rows = await q<EnquiryRow>(`select ${ROW_COLS} from enquiries ${w} order by created_at desc limit ${PAGE_SIZE} offset ${(page - 1) * PAGE_SIZE}`, p);
   return { rows, total: n, page, pages: Math.max(1, Math.ceil(n / PAGE_SIZE)) };
 }
 
@@ -99,7 +103,7 @@ export async function saveEnquiry(id: string, userId: string, v: { status: strin
   }
   const notes = clean(v.notes, 4000);
   return tx(async (run) => {
-    const [cur] = await run<Enquiry>("select * from enquiries where id=$1 for update", [id]);
+    const [cur] = await run<Pick<Enquiry, "status" | "appointment_at" | "notes">>("select status, appointment_at, notes from enquiries where id=$1 for update", [id]);
     if (!cur) return "Enquiry not found.";
     await run("update enquiries set status=$2, appointment_at=$3, notes=$4, updated_at=now(), updated_by=$5 where id=$1", [id, v.status, appt, notes, userId]);
     if (cur.status !== v.status)
