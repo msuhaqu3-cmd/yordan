@@ -48,7 +48,7 @@ export async function createEnquiry(e: NewEnquiry) {
 /** Website forms report whether the FormSubmit e-mail went out, so the team can spot a failed delivery. */
 export async function setEmailStatus(ref: string, status: unknown) {
   if ((status !== "sent" && status !== "failed") || !/^[A-Za-z0-9_-]{8,64}$/.test(ref)) return;
-  await q("update enquiries set email_status=$2 where ref=$1 and source='website' and email_status is null", [ref, status]);
+  await q("update enquiries set email_status=$2 where ref=$1 and source='website' and email_status is null and created_at > now() - interval '15 minutes'", [ref, status]);
 }
 
 export const SOURCE_LABEL: Record<string, string> = { website: "Website", app: "Mobile app" };

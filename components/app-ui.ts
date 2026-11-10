@@ -148,7 +148,7 @@ function valid(){
 drawWiz();
 
 function drawReqs(){const r=store.get('yordanReqs',[]);
-  $('#myReqs').innerHTML=r.length?r.slice().reverse().map(x=>`<div class="row req"><div><b>${x.svc}</b><small>${x.date} · ${x.postcode}</small></div><span class="tag">Sent</span></div>`).join(''):'<div class="empty">No quote requests yet.</div>'}
+  $('#myReqs').innerHTML=r.length?r.slice().reverse().map(x=>`<div class="row req"><div><b>${esc(x.svc)}</b><small>${esc(x.date)} · ${esc(x.postcode)}</small></div><span class="tag">Sent</span></div>`).join(''):'<div class="empty">No quote requests yet.</div>'}
 
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),2200)}
 

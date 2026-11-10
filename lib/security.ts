@@ -5,7 +5,8 @@ import { q } from "./db";
 
 export async function clientIp(): Promise<string> {
   const h = await headers();
-  return (h.get("x-forwarded-for")?.split(",")[0] || h.get("x-real-ip") || "unknown").trim();
+  // x-vercel-forwarded-for is set by the platform and cannot be spoofed by the client.
+  return (h.get("x-vercel-forwarded-for")?.split(",")[0] || h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0] || "unknown").trim();
 }
 
 /** IPs are only ever stored hashed (salted with the auth secret). */
