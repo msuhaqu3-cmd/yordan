@@ -2,13 +2,15 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "../globals.css";
 import jsonLd from "@/lib/jsonld.json";
+import { applyTokens } from "@/lib/settings";
+import { getSiteData } from "@/lib/site-data";
 import { FONTS_HREF, SITE_NAME, SITE_URL, THEME } from "@/lib/site";
 import PwaRegister from "@/components/pwa-register";
 import InstallApp from "@/components/install-app";
 
 const TITLE = "Builders & Decorators North London | Yordan Decorations & Building";
-const DESC =
-  "Insured builders, painters & decorators in North London (N8, Haringey). Renovations, loft conversions, kitchens, bathrooms, plumbing, electrical, HMO maintenance. Free quotes: 07846 292529.";
+const desc = (phone: string) =>
+  `Insured builders, painters & decorators in North London (N8, Haringey). Renovations, loft conversions, kitchens, bathrooms, plumbing, electrical, HMO maintenance. Free quotes: ${phone}.`;
 const OG_IMG = `${SITE_URL}/images/building-renovation-london.webp`;
 
 const splash: [number, number, number][] = [
@@ -24,7 +26,10 @@ const splash: [number, number, number][] = [
   [810, 1080, 2],
 ];
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const { vars } = await getSiteData();
+  const DESC = desc(vars.PHONE);
+  return {
   metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESC,
@@ -74,7 +79,8 @@ export const metadata: Metadata = {
     ICBM: "51.587598, -0.107096",
     "mobile-web-app-capable": "yes",
   },
-};
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -83,7 +89,9 @@ export const viewport: Viewport = {
   themeColor: THEME,
 };
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default async function SiteLayout({ children }: { children: ReactNode }) {
+  const { vars } = await getSiteData();
+  const ld = applyTokens(JSON.stringify(jsonLd), vars);
   return (
     <html lang="en-GB">
       <head>
@@ -98,7 +106,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
               "try{if((matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)&&location.pathname==='/'){location.replace('/app'+location.search)}}catch(e){}",
           }}
         />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ld.replace(/</g, "\\u003c") }} />
       </head>
       <body>
         {children}

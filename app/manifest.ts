@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
+import { getSiteData } from "@/lib/site-data";
 
-export default function manifest(): MetadataRoute.Manifest {
+export const revalidate = 300;
+
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const { vars } = await getSiteData();
   return {
     id: "/",
     name: "Yordan Decorations & Building Ltd",
@@ -24,7 +28,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       { name: "Get a quote", url: "/app?tab=quote", icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }] },
-      { name: "Call us", url: "tel:+447846292529" },
+      { name: "Call us", url: `tel:${vars.TEL}` },
     ],
   };
 }

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { readContent } from "@/lib/content";
 import { SITE_URL } from "@/lib/site";
+import { applyTokens } from "@/lib/settings";
+import { getSiteData } from "@/lib/site-data";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Cookie Policy | Yordan Decorations & Building",
@@ -11,6 +15,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
 };
 
-export default function Page() {
-  return <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: readContent("legal/cookie-policy.html") }} />;
+export default async function Page() {
+  const d = await getSiteData();
+  return <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: applyTokens(readContent("legal/cookie-policy.html"), d.vars) }} />;
 }

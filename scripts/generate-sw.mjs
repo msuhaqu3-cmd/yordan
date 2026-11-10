@@ -46,7 +46,8 @@ async function networkFirstPage(request) {
   try {
     const res = await fetch(request);
     // Only cache successful, public page responses.
-    if (res.ok && res.type === "basic") {
+    const cc = res.headers.get("cache-control") || "";
+    if (res.ok && res.type === "basic" && !/no-store|private/i.test(cc)) {
       const cache = await caches.open(PAGES);
       cache.put(request, res.clone()).then(() => trim(PAGES, MAX_PAGES));
     }
@@ -80,12 +81,12 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith("/api/") || url.pathname === "/sw.js") return;
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin") || url.pathname === "/sw.js") return;
 
   if (request.mode === "navigate") {
     event.respondWith(networkFirstPage(request));
-  } else if (url.pathname.startsWith("/_next/static/")) {
-    event.respondWith(cacheFirst(request, STATIC)); // content-hashed, immutable
+  } else if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/media/")) {
+    event.respondWith(cacheFirst(request, STATIC)); // content-hashed / content-addressed, immutable
   } else if (url.pathname.startsWith("/images/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/splash/")) {
     event.respondWith(staleWhileRevalidate(request, MEDIA, MAX_MEDIA));
   } else if (url.pathname === "/legal.css" || url.pathname === "/manifest.webmanifest") {

@@ -1,7 +1,10 @@
 // @ts-nocheck
 /* Mobile app UI behaviour, moved from the provided yordan-app.html (logic unchanged). */
 export function initApp(){
-const PHONE='447846292529', TEL='tel:+447846292529';
+const SITE=window.__SITE__||{}, MEDIA=SITE.media||{};
+const PHONE=SITE.wa||'447846292529', TEL='tel:'+(SITE.tel||'+447846292529'), PHONE_DISP=SITE.phone||'07846 292529';
+const newRef=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+let REF=newRef();
 const I = {
   paint:'<path d="M19 3H5v6h14zM12 9v4M10 13h4v8h-4z"/>',
   bath:'<path d="M4 12h16v3a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM6 12V5a2 2 0 0 1 4 0"/>',
@@ -61,13 +64,16 @@ $('#reviews').innerHTML=REVIEWS.map(r=>`<div class="card review"><div class="sta
 const cats=['All','Bathrooms','Interiors','On site'];let pc='All';
 function drawProj(){
   $('#projChips').innerHTML=cats.map(c=>`<button class="chip${c===pc?' on':''}" data-pc="${c}">${c}</button>`).join('');
-  $('#projGrid').innerHTML=PROJECTS.filter(p=>pc==='All'||p[0]===pc).map((p,i)=>`<div class="tile" style="background:linear-gradient(160deg,${p[3]},${p[2]})">
-    <svg class="bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 70 L30 55 L60 68 L100 50 L100 100 L0 100Z" fill="rgba(0,0,0,.18)"/><rect x="${20+i*7%40}" y="18" width="22" height="30" fill="rgba(255,255,255,.12)"/></svg>
-    <span><small>${p[0]}</small>${p[1]}</span></div>`).join('');
+  $('#projGrid').innerHTML=PROJECTS.map((p,idx)=>({p,idx})).filter(o=>pc==='All'||o.p[0]===pc).map(({p,idx},i)=>{const im=MEDIA['app:project:'+idx];
+    return `<div class="tile${im?' img':''}" style="${im?`background:#222 url('${im}') center/cover no-repeat`:`background:linear-gradient(160deg,${p[3]},${p[2]})`}">
+    ${im?'':`<svg class="bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 70 L30 55 L60 68 L100 50 L100 100 L0 100Z" fill="rgba(0,0,0,.18)"/><rect x="${20+i*7%40}" y="18" width="22" height="30" fill="rgba(255,255,255,.12)"/></svg>`}
+    <span><small>${p[0]}</small>${p[1]}</span></div>`}).join('');
 }
 drawProj();
 
 // before/after
+if(MEDIA['app:before']){const b=$('.ba-before');b.style.background=`url('${MEDIA['app:before']}') center/cover no-repeat`;b.classList.add('im')}
+if(MEDIA['app:after']){const a=$('#baAfter');a.style.background=`url('${MEDIA['app:after']}') center/cover no-repeat`;a.classList.add('im')}
 (function(){const st=$('#ba'),a=$('#baAfter'),h=$('#baHandle');let drag=false;
  const set=x=>{const r=st.getBoundingClientRect();let p=Math.min(100,Math.max(0,(x-r.left)/r.width*100));a.style.clipPath=`inset(0 0 0 ${p}%)`;h.style.left=p+'%'};
  st.addEventListener('pointerdown',e=>{drag=true;st.setPointerCapture(e.pointerId);set(e.clientX)});
@@ -89,9 +95,9 @@ $('#sheetBg').onclick=closeSheet;
 function svcSheet(id){const s=ALL.find(x=>x.id===id);
   openSheet(`<span class="ic" style="width:48px;height:48px;border-radius:14px;background:#fff;display:grid;place-items:center;border:1px solid var(--line)">${ic(s.icon,'currentColor',24)}</span>
   <h2 style="margin-top:14px">${s.name}</h2><p class="sub">${s.desc}</p><ul>${s.inc.map(x=>`<li>${x}</li>`).join('')}</ul>
-  <div class="stack"><button class="btn btn-dark" data-quote-svc="${s.id}">Get a free quote</button><a class="btn btn-out" href="${TEL}">Call 07846 292529</a></div>`)}
+  <div class="stack"><button class="btn btn-dark" data-quote-svc="${s.id}">Get a free quote</button><a class="btn btn-out" href="${TEL}">Call ${PHONE_DISP}</a></div>`)}
 function emergencySheet(){openSheet(`<h2>Emergency help</h2><p class="sub">For leaks, burst pipes, heating failures or anything unsafe. Calling is fastest.</p>
-  <div class="stack" style="margin-top:18px"><a class="btn btn-danger" href="${TEL}">Call now · 07846 292529</a>
+  <div class="stack" style="margin-top:18px"><a class="btn btn-danger" href="${TEL}">Call now · ${PHONE_DISP}</a>
   <a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/${PHONE}?text=${encodeURIComponent('EMERGENCY: I need urgent help. Postcode: ')}">WhatsApp with photos</a>
   <button class="btn btn-out" data-quote-svc="emergency">Send details instead</button></div>
   <p class="sub" style="margin-top:16px;font-size:12px">If there is a gas smell, leave the property and call the National Gas Emergency line on 0800 111 999.</p>`)}
@@ -99,7 +105,7 @@ function emergencySheet(){openSheet(`<h2>Emergency help</h2><p class="sub">For l
 // quote wizard
 const TYPES=ALL.map(s=>[s.id,s.name,s.icon]);
 let q,step;
-function resetQ(svc){q={svc:svc||'',prop:'',timing:'',details:'',postcode:'',name:'',phone:'',email:''};step=svc?1:0}
+function resetQ(svc){REF=newRef();q={svc:svc||'',prop:'',timing:'',details:'',postcode:'',name:'',phone:'',email:''};step=svc?1:0}
 resetQ();
 const STEPS=['What do you need?','Property','The job','Your details','Review'];
 function drawWiz(){
@@ -156,7 +162,7 @@ document.addEventListener('click',e=>{
   else if(t.dataset.pc){pc=t.dataset.pc;drawProj()}
   else if(t.dataset.pick){q[t.dataset.pick]=t.dataset.v;drawWiz();if(step===0)setTimeout(()=>{step=1;drawWiz()},180)}
   else if(t.dataset.wiz){capture();if(t.dataset.wiz==='back'){step--;drawWiz()}else{const m=valid();if(m){$('#err').textContent=m;return}step++;drawWiz()}}
-  else if(t.hasAttribute('data-sent')){const r=store.get('yordanReqs',[]);r.push({svc:ALL.find(x=>x.id===q.svc).name,postcode:q.postcode,date:new Date().toLocaleDateString('en-GB')});store.set('yordanReqs',r);toast('Opening your messages…')}
+  else if(t.hasAttribute('data-sent')){const r=store.get('yordanReqs',[]);r.push({svc:ALL.find(x=>x.id===q.svc).name,postcode:q.postcode,date:new Date().toLocaleDateString('en-GB')});store.set('yordanReqs',r);toast('Opening your messages…');try{fetch('/api/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({ref:REF,source:'app',service:ALL.find(x=>x.id===q.svc).name,property_type:cap(q.prop),timing:q.timing,postcode:q.postcode,details:q.details,name:q.name,phone:q.phone,email:q.email})}).catch(()=>{})}catch(e){}}
 });
 // Deep link support (manifest shortcuts): /app?tab=quote
 (function(){const t=new URLSearchParams(location.search).get('tab');if(t&&document.querySelector('.screen[data-s="'+t+'"]')){if(t==='quote'&&step===4){resetQ();drawWiz()}go(t)}})();

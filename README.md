@@ -74,3 +74,47 @@ Production build + typecheck; pixel comparison with the old static site (legal p
 non-deterministic animation frames, which also differ between two loads of the original); quote form (success, failure,
 activation states, payload); manifest keys and all four icons; service-worker activation and control; offline home /
 cached page / offline fallback; Android-style install prompt; iOS Safari instructions; no console errors.
+
+## Admin portal (`/admin`)
+One place to manage the website **and** the mobile app: quote requests and their stage, photos, company info and team accounts.
+
+### One-time setup on Vercel
+1. **Database:** Vercel project → *Storage* → *Create Database* → **Neon (Postgres)** → connect it to this project. This adds `DATABASE_URL` automatically (any other Postgres works too).
+2. **Environment variables** (Project → Settings → Environment Variables), for Production (and Preview if you want to test there):
+   - `AUTH_SECRET`: a long random string (32+ characters), e.g. from `openssl rand -base64 48`.
+   - `ADMIN_EMAIL`: the administrator's login email.
+   - `ADMIN_PASSWORD`: a **temporary** password (10+ characters). You must change it at first login.
+3. **Redeploy**, open `https://<your-domain>/admin`, sign in, set your own password. Then **delete `ADMIN_PASSWORD`** from Vercel.
+Tables are created automatically on first start. Without these variables the public site keeps working exactly as before (original content), and `/admin` shows "not set up".
+
+Lost the admin password? Set `ADMIN_RECOVERY_PASSWORD` to a new temporary value, redeploy, sign in, change it, delete the variable.
+
+### What you can do
+| Area | What it does |
+|---|---|
+| **Enquiries** | Every website and app quote request, with stage **new → contacted → confirmed → completed / cancelled**, appointment date/time (UK time), private notes, history, search and filters, one-tap call / WhatsApp / email. |
+| **Media** | Replace any website photo (gallery, service images, founder, logos) and the mobile-app gallery tiles / before-after slider. Photos are resized and stored in the database; *Reset* restores the original. |
+| **Company info** | Phone, WhatsApp number, contact email, address, TikTok. Updates the website, legal pages, structured data, manifest shortcuts and the app. |
+| **Users** | The administrator adds team members, resets passwords, disables or deletes them. |
+| **My account** | Everyone can change their own password. |
+
+### Roles
+- **Administrator** (exactly one): everything, including Users. This account can only be changed by its owner (from *My account*); nobody else, including team members, can modify, disable or delete it.
+- **Team member:** can manage enquiries, media and company info, and change their own password. Cannot see or use *Users*, cannot delete enquiries, cannot touch any account except their own password.
+
+### Quote notifications are unchanged
+Website quotes are still emailed by FormSubmit; the website and the app still open WhatsApp / SMS as before. The portal only receives a **copy** (a failure there never affects the customer). Because the app opens WhatsApp/SMS on the customer's phone, an app enquiry is recorded when the customer taps *Send*, not when the message is actually delivered. The FormSubmit inbox is configured separately and is intentionally not editable in the portal (changing it needs a new FormSubmit activation).
+
+### Security
+- Passwords: scrypt (memory-hard), 10+ characters with a letter and number, common passwords rejected; admin-set temporary passwords force a change at first login.
+- Sessions: signed, `HttpOnly`, `Secure`, `SameSite=Lax` cookie, 12 h; every request re-checks the database, so disabling a user or changing/resetting a password signs out their other devices immediately.
+- Brute-force protection: 5 wrong passwords per email (25 per IP) → 15-minute lock; unknown emails take the same time as real ones; generic error messages.
+- CSRF: server actions are origin-checked by Next.js; the upload and enquiry endpoints verify the `Origin` header.
+- Public endpoints: the enquiry endpoint validates, size-limits, rate-limits (10 per 10 min per IP, IPs stored only as salted hashes) and de-duplicates retries.
+- Uploads: type verified by file signature, re-encoded to WebP (metadata such as GPS removed), max 4 MB, served with `nosniff`.
+- Admin pages and APIs: `Cache-Control: no-store`, `noindex`, not framable, excluded from the service worker and from `robots.txt`.
+- Server-side checks on every action; all SQL is parameterised; enquiry text is always rendered as text (never HTML).
+- Audit log of sign-ins, password changes, user changes, media and settings changes (table `audit_log`).
+
+### Data & limits
+Data lives in your Postgres database (Neon's free tier is plenty for thousands of enquiries). Photos are stored in the same database (≈100-300 KB each after resizing). Public pages are cached and refreshed within a minute, or immediately after you save in the portal.

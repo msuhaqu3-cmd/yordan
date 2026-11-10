@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  serverExternalPackages: ["pg", "sharp"],
+  // Page markup lives in /content and is read at (re)generation time, so make sure it ships with the server bundle.
+  outputFileTracingIncludes: { "/*": ["./content/**/*"] },
   trailingSlash: false,
   // Keep the original public URLs (used in Google, sitemap.xml and canonicals).
   async rewrites() {
@@ -28,7 +31,22 @@ const config: NextConfig = {
         ],
       },
       {
-        source: "/:path*",
+        // Admin portal and its APIs: never cached, never framed, never indexed.
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, max-age=0" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "same-origin" },
+        ],
+      },
+      {
+        source: "/api/admin/:path*",
+        headers: [{ key: "Cache-Control", value: "no-store, max-age=0" }, { key: "X-Frame-Options", value: "DENY" }],
+      },
+      {
+        source: "/((?!admin|api/admin).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

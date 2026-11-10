@@ -1,6 +1,10 @@
 import RetryButton from "./retry-button";
+import { getSiteData } from "@/lib/site-data";
 
-export default function OfflinePage() {
+export const revalidate = 300;
+
+export default async function OfflinePage() {
+  const { vars } = await getSiteData();
   return (
     <main>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -11,8 +15,8 @@ export default function OfflinePage() {
         free quote.
       </p>
       <RetryButton />
-      <a className="o" href="tel:+447846292529">
-        Call 07846 292529
+      <a className="o" href={`tel:${vars.TEL}`}>
+        Call {vars.PHONE}
       </a>
     </main>
   );

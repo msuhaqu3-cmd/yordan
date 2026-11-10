@@ -9,7 +9,7 @@
       "slogan": "Build. Renovate. Maintain.",
       "description": "Insured building, renovation, painting and decorating, maintenance and property services for homeowners, landlords, HMOs and businesses in North London and across London.",
       "url": "https://www.yordandecorationsandbuilding.com/",
-      "telephone": "+447846292529","email":"yordandecoandbuilding@gmail.com",
+      "telephone": "{{TEL}}","email":"{{EMAIL}}",
       "image": [
         "https://www.yordandecorationsandbuilding.com/images/building-renovation-london.webp",
         "https://www.yordandecorationsandbuilding.com/images/recent-building-work.webp",
@@ -18,14 +18,14 @@
       "logo": "https://www.yordandecorationsandbuilding.com/images/logo.webp",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "1 Hampton Road",
+        "streetAddress": "{{ADDR1}}",
         "addressLocality": "London",
         "addressRegion": "Haringey",
-        "postalCode": "N8 0HX",
+        "postalCode": "{{POSTCODE}}",
         "addressCountry": "GB"
       },
       "geo": {"@type": "GeoCoordinates", "latitude": 51.587598, "longitude": -0.107096},
-      "hasMap": "https://www.google.com/maps/search/?api=1&query=1+Hampton+Road+London+N8+0HX",
+      "hasMap": "https://www.google.com/maps/search/?api=1&query={{ADDR_QUERY}}",
       "currenciesAccepted": "GBP",
       "areaServed": [
         {"@type": "City", "name": "London"},
@@ -52,8 +52,8 @@
         {"@type": "EducationalOccupationalCredential", "name": "Public liability insurance up to £5,000,000 (Simply Business, policy ZIBI5570537XB, 21 May 2026 – 20 May 2027)"},
         {"@type": "EducationalOccupationalCredential", "name": "Employers' liability insurance, minimum £5 million (Zurich Insurance Company Ltd, 21 May 2026 – 20 May 2027)"}
       ],
-      "contactPoint": {"@type": "ContactPoint", "telephone": "+447846292529", "contactType": "customer service", "areaServed": "GB", "availableLanguage": ["English"]},
-      "sameAs": ["https://www.tiktok.com/@yordan.decoration"],
+      "contactPoint": {"@type": "ContactPoint", "telephone": "{{TEL}}", "contactType": "customer service", "areaServed": "GB", "availableLanguage": ["English"]},
+      "sameAs": ["https://www.tiktok.com/@{{TIKTOK}}"],
       "knowsAbout": ["Building", "Renovation", "Painting and decorating", "Loft conversions", "Kitchen fitting", "Bathroom renovation", "Plumbing", "Electrical work", "Boiler and heating", "Windows and doors", "Double glazing", "Property maintenance", "HMO maintenance", "Commercial fit-outs"],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -72,7 +72,7 @@
           {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Handyman services", "serviceType": "Handyman", "description": "Reliable handyman for repairs, fixes and small jobs in North London.", "areaServed": "London", "provider": {"@id": "https://www.yordandecorationsandbuilding.com/#business"}}},
           {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Commercial fit-outs", "serviceType": "Commercial fit-out and maintenance", "description": "Fit-outs and maintenance for restaurants, retail and offices.", "areaServed": "London", "provider": {"@id": "https://www.yordandecorationsandbuilding.com/#business"}}},
           {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Landlord & HMO maintenance", "serviceType": "Property maintenance for landlords and HMOs", "description": "Repairs, tenancy turnaround, decorating and planned maintenance for landlords and HMO operators.", "areaServed": "London", "provider": {"@id": "https://www.yordandecorationsandbuilding.com/#business"}}},
-          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Emergency repairs", "serviceType": "Emergency building repairs", "description": "Urgent repairs for homes, rentals and businesses. Call 07846 292529.", "areaServed": "London", "provider": {"@id": "https://www.yordandecorationsandbuilding.com/#business"}}}
+          {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Emergency repairs", "serviceType": "Emergency building repairs", "description": "Urgent repairs for homes, rentals and businesses. Call {{PHONE}}.", "areaServed": "London", "provider": {"@id": "https://www.yordandecorationsandbuilding.com/#business"}}}
         ]
       }
     },
@@ -103,11 +103,11 @@
       "mainEntity": [
         {"@type": "Question", "name": "Do you give fixed prices online?", "acceptedAnswer": {"@type": "Answer", "text": "No. Send your details and the team will review them and provide an estimate. Quotes are free."}},
         {"@type": "Question", "name": "Are you insured?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Our certificates show public liability up to £5,000,000 and employers' liability, valid 21 May 2026 to 20 May 2027."}},
-        {"@type": "Question", "name": "Which areas do you cover?", "acceptedAnswer": {"@type": "Answer", "text": "We are based in North London (N8 0HX) and work on projects across London. Include your postcode with an enquiry and we'll confirm."}},
+        {"@type": "Question", "name": "Which areas do you cover?", "acceptedAnswer": {"@type": "Answer", "text": "We are based in North London ({{POSTCODE}}) and work on projects across London. Include your postcode with an enquiry and we'll confirm."}},
         {"@type": "Question", "name": "Do you handle commercial work?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We take on fit-outs and maintenance for restaurants, retail and offices."}},
         {"@type": "Question", "name": "Do you work with landlords?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We support landlords and HMO operators with repairs, tenancy turnaround, decorating and ongoing maintenance."}},
         {"@type": "Question", "name": "Do you do loft conversions, kitchens and bathrooms?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We handle loft conversions, kitchen and bathroom renovations, extensions and structural works, from planning through to the final finish."}},
-        {"@type": "Question", "name": "Can you help with an emergency repair?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Call 07846 292529 or send an urgent request through the website and mark it as an emergency."}}
+        {"@type": "Question", "name": "Can you help with an emergency repair?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Call {{PHONE}} or send an urgent request through the website and mark it as an emergency."}}
       ]
     }
   ]
