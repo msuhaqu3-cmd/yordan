@@ -14,7 +14,8 @@ previous static site (verified with screenshot comparison).
 | `app/globals.css` | Original site CSS (moved verbatim) |
 | `content/` | Page markup as HTML fragments, rendered on the server |
 | `components/legacy-home.ts` | Original page script (menu, gallery, quote form, assistant), run by `home-behaviour.tsx` |
-| `components/install-app.tsx` | Footer "Install App" link: native prompt (Chrome/Edge/Android) or iOS instructions |
+| `app/(app)` + `components/app-ui.ts` | Mobile-app UI served at `/app` (opened by the installed app) |
+| `components/install-app.tsx` | "Download Mobile App" button/link, Android and iOS only |
 | `components/pwa-register.tsx` | Service-worker registration (production only) |
 | `scripts/generate-sw.mjs` | Writes `public/sw.js` with a new cache version on every build |
 | `public/` | Images, icons (`icons/`), iOS splash (`splash/`), sitemap, robots, Search Console file |
@@ -33,12 +34,24 @@ npm run build && npm start   # production build, test PWA at http://localhost:30
 3. HTTPS is required for PWA features; Vercel provides it for your domain.
 
 ## How installing works
-- **Android / Chrome / Edge (desktop):** when the browser decides the site is installable, an **Install App** link appears
-  in the footer (Legal column). Tapping it opens the native install prompt. It disappears once installed.
-  Browsers also show their own install icon in the address bar / menu.
-- **iPhone / iPad (Safari):** the same footer link opens a short guide: Share → Add to Home Screen → Add.
-  (iOS cannot be installed from a button, so only instructions are shown. Other iOS browsers are not offered it.)
-- Nothing is shown to visitors who cannot install or already run the installed app, so the page design is unchanged.
+- **Android (Chrome, Samsung Internet, ...):** a floating **Download Mobile App** button (bottom-left, above WhatsApp) and a
+  footer link appear. Chrome's native install prompt opens when the browser provides it; otherwise the button shows the
+  manual steps (browser menu ⋮ → Install app / Add to Home screen).
+- **iPhone / iPad (Safari):** the same button opens a short guide: Share → Add to Home Screen → Add
+  (iOS cannot be installed from a button, so only instructions are shown).
+- **Desktop (Windows, macOS, Linux, Chrome, Edge):** no install option is shown.
+- Nothing is shown once the app is installed / running standalone.
+
+## Website vs installed app (two different UIs, one codebase)
+- In a browser (desktop or mobile) visitors always get the normal website at `/`.
+- The installed app opens **`/app`** (manifest `start_url`), a mobile-app interface (bottom tabs: Home, Services, Quote,
+  Projects, About; services sheet; 5-step quote wizard; emergency sheet). Its source is `content/app.html`,
+  `app/(app)/app.css` and `components/app-ui.ts` (from `yordan-app.html`).
+- If the installed app is ever opened at `/` (e.g. an old iOS home-screen icon), a tiny script in the site layout
+  redirects it to `/app` when it detects standalone mode.
+- `/app` is `noindex` so search engines keep listing the website only.
+- The app's quote wizard sends through WhatsApp / SMS (as in the provided design); the website form emails via FormSubmit.
+- The gallery tiles and the before/after slider in the app are still placeholders (as in the provided file).
 
 ## Offline & caching (`public/sw.js`, generated)
 - Pages: network first, last good copy when offline, otherwise `/offline`.

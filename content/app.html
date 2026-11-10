@@ -1,0 +1,151 @@
+<div class="app" id="app">
+  <header>
+    <div class="logo"><b>YORDAN</b><span>Decorations &amp; Building Ltd</span></div>
+    <a class="hdr-call" href="tel:+447846292529" aria-label="Call">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+    </a>
+  </header>
+
+  <main id="main">
+    <!-- HOME -->
+    <section class="screen on" data-s="home">
+      <div class="hero">
+        <span class="pill"><span class="dot"></span>Free quotes · North London &amp; across London</span>
+        <h1>Your property.<br><i>Our craft.</i></h1>
+        <p>Builders &amp; decorators with 15+ years of hands-on trade experience. Fully insured, from a quick repair to a full renovation.</p>
+        <div class="cta-row">
+          <button class="btn btn-light" data-go="quote">Get a quote</button>
+          <a class="btn btn-ghost" href="tel:+447846292529">Call now</a>
+        </div>
+      </div>
+
+      <div class="emergency">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b3261e" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg>
+        <div><h3>Leak, burst pipe or no heating?</h3><p>Request emergency help now</p></div>
+        <button class="go" data-sheet="emergency">Help</button>
+      </div>
+
+      <div class="pad">
+        <div class="stats">
+          <div class="stat"><b>15+</b><span>years experience</span></div>
+          <div class="stat"><b>£5m</b><span>public liability</span></div>
+          <div class="stat"><b>10+</b><span>trades in-house</span></div>
+        </div>
+
+        <div class="eyebrow">Popular services</div>
+        <div class="grid" id="homeSvcs"></div>
+        <button class="btn btn-out" style="margin-top:12px" data-go="services">See all services</button>
+
+        <div class="eyebrow">What clients say</div>
+        <div class="stack" id="reviews"></div>
+
+        <div class="eyebrow">How it works</div>
+        <div class="card steps">
+          <div class="step"><div><h3>Tell us what you need</h3><p>Send a quick request with your postcode and a few details.</p></div></div>
+          <div class="step"><div><h3>We assess</h3><p>We look at the job, in person if needed.</p></div></div>
+          <div class="step"><div><h3>We plan</h3><p>A clear, free quote and a timeline you can count on.</p></div></div>
+          <div class="step"><div><h3>We deliver</h3><p>Qualified trades, tidy site, regular updates.</p></div></div>
+          <div class="step"><div><h3>We leave it right</h3><p>Final walkthrough and a clean finish.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="screen" data-s="services">
+      <div class="pad">
+        <h2>Services</h2>
+        <p class="sub">One team for building, renovation and maintenance. Tap a service for details.</p>
+        <div class="eyebrow">Homeowners</div>
+        <div class="grid" id="allSvcs"></div>
+        <div class="eyebrow">Landlords &amp; business</div>
+        <div class="grid" id="bizSvcs"></div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="screen" data-s="projects">
+      <div class="pad">
+        <h2>Projects</h2>
+        <p class="sub">A look at recent work around London.</p>
+        <div class="eyebrow">Before &amp; after</div>
+        <div class="ba">
+          <div class="ba-stage" id="ba">
+            <div class="ba-before">Before</div>
+            <div class="ba-after" id="baAfter">After</div>
+            <div class="ba-handle" id="baHandle"></div>
+          </div>
+          <div class="ba-cap">Drag to compare. Bathroom strip-out to full refit.</div>
+        </div>
+        <div class="eyebrow">Gallery</div>
+        <div class="chips" id="projChips"></div>
+        <div class="proj" id="projGrid"></div>
+      </div>
+    </section>
+
+    <!-- QUOTE -->
+    <section class="screen" data-s="quote">
+      <div class="pad">
+        <h2>Get a free quote</h2>
+        <p class="sub">Takes about a minute. No obligation.</p>
+        <div class="prog" id="prog" style="margin-top:16px"></div>
+        <div id="wiz"></div>
+        <div class="err" id="err"></div>
+        <div class="wiz-nav" id="wizNav"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT / CONTACT -->
+    <section class="screen" data-s="about">
+      <div class="pad">
+        <h2>About us</h2>
+        <p class="sub">Founded by Yordan Minchev, with over 15 years of hands-on experience across the UK and Europe. Our fully insured team brings a trade background across plumbing, electrical, renovation and structural maintenance.</p>
+
+        <div class="eyebrow">Contact</div>
+        <div class="card">
+          <a class="row" href="tel:+447846292529"><span class="ic">📞</span><div><b>07846 292529</b><small>Free quotes &amp; emergency repairs</small></div>›</a>
+          <a class="row" href="https://wa.me/447846292529" target="_blank" rel="noopener"><span class="ic">💬</span><div><b>WhatsApp</b><small>Send photos of the job</small></div>›</a>
+          <a class="row" href="https://maps.google.com/?q=1+Hampton+Road+London+N8+0HX" target="_blank" rel="noopener"><span class="ic">📍</span><div><b>1 Hampton Road</b><small>London N8 0HX</small></div>›</a>
+          <a class="row" href="https://www.tiktok.com/@yordan.decoration" target="_blank" rel="noopener"><span class="ic">🎬</span><div><b>@yordan.decoration</b><small>Follow on TikTok</small></div>›</a>
+        </div>
+
+        <div class="eyebrow">Our values</div>
+        <div class="grid">
+          <div class="svc"><h3>Quality</h3><p>Proper prep and a finish that lasts.</p></div>
+          <div class="svc"><h3>Reliability</h3><p>We turn up when we say we will.</p></div>
+          <div class="svc"><h3>Craftsmanship</h3><p>Real trade skills, not shortcuts.</p></div>
+          <div class="svc"><h3>Insured</h3><p>Public &amp; employers' liability cover.</p></div>
+        </div>
+
+        <div class="eyebrow">Insurance</div>
+        <div class="card">
+          <span class="badge">✓ Verified cover</span>
+          <p class="sub" style="margin-top:10px">Public liability up to £5,000,000 (Simply Business), valid 21 May 2026 to 20 May 2027. Employers' liability with Zurich Insurance Company Ltd.</p>
+        </div>
+
+        <div class="eyebrow">My requests</div>
+        <div class="card" id="myReqs"></div>
+
+        <div class="eyebrow">FAQ</div>
+        <div class="card" style="padding:4px 16px">
+          <details><summary>Do you charge for quotes?</summary><p>No. Quotes are free. We review your details and come back with a clear price.</p></details>
+          <details><summary>Which areas do you cover?</summary><p>We're based in N8 and take on projects across London. Include your postcode and we'll confirm.</p></details>
+          <details><summary>Are you insured?</summary><p>Yes, with public liability up to £5,000,000 and employers' liability cover.</p></details>
+          <details><summary>Can you work outside business hours?</summary><p>For commercial fit-outs we often work evenings and weekends so you can keep trading.</p></details>
+          <details><summary>Do you handle emergencies?</summary><p>Yes. Call 07846 292529 or use the emergency button on the home screen.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs" id="tabs">
+    <button data-go="home" class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button data-go="services"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Services</button>
+    <button data-go="quote" class="q"><span class="qi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span>Quote</button>
+    <button data-go="projects"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>Projects</button>
+    <button data-go="about"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>About</button>
+  </nav>
+
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" id="sheet"></div>
+  <div class="toast" id="toast"></div>
+</div>

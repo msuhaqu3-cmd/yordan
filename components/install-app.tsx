@@ -20,10 +20,10 @@ function isIosSafari() {
 }
 
 /**
- * Wires up the footer "Install App" link (present, but hidden, in the page markup):
- *  - Chrome/Edge/Android: shown once the browser says the app is installable; opens the native prompt.
- *  - iPhone/iPad Safari: shown, opens Share -> Add to Home Screen instructions (iOS has no install API).
- *  - Hidden when already installed / running standalone, and in unsupported browsers.
+ * "Download Mobile App" floating button + footer link (the link exists, hidden, in the page markup).
+ *  - Android: shown; uses the native install prompt when the browser provides it, otherwise menu steps.
+ *  - iPhone/iPad Safari: shown; opens Share -> Add to Home Screen instructions (iOS has no install API).
+ *  - Never shown on desktop, in unsupported browsers, or once the app is installed / running standalone.
  */
 export default function InstallApp() {
   const [sheet, setSheet] = useState(false);
@@ -62,10 +62,7 @@ export default function InstallApp() {
         await d.prompt();
         const { outcome } = await d.userChoice;
         if (outcome === "accepted") hide();
-        else {
-          // Browsers only fire beforeinstallprompt again later; keep link hidden until then.
-          hide();
-        }
+        // If dismissed, keep the button: tapping it again shows the manual steps.
       } else {
         setSheet(true);
       }
@@ -77,15 +74,18 @@ export default function InstallApp() {
     };
     act.current = run;
 
+    // Mobile only: Android and iPhone/iPad. Desktop (Windows, macOS, Linux, ChromeOS) never gets an install option.
     const { ios, safari } = isIosSafari();
+    const android = /Android/i.test(navigator.userAgent);
     if (ios && safari) {
       setPlatform("ios");
       show();
-    } else if (/Android/i.test(navigator.userAgent)) {
-      // Android: show the button even if Chrome has not fired the install event yet
-      // (e.g. preview/protected deployments, or it was dismissed recently); fall back to menu instructions.
+    } else if (android) {
+      // Show the button even if Chrome has not fired the install event yet; fall back to menu instructions.
       setPlatform("android");
       show();
+    } else {
+      return;
     }
 
     window.addEventListener("beforeinstallprompt", onPrompt);
@@ -108,11 +108,11 @@ export default function InstallApp() {
   return (
     <>
       {can && (
-        <button type="button" className="ins-fab" onClick={() => act.current()} aria-label="Download our app">
+        <button type="button" className="ins-fab" onClick={() => act.current()} aria-label="Download our mobile app">
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Download App
+          Download Mobile App
         </button>
       )}
       {sheet && <InstallSheet platform={platform} onClose={() => setSheet(false)} />}

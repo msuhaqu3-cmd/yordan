@@ -17,7 +17,7 @@ const MEDIA = "yordan-media-" + VERSION;
 const ALL = [PRECACHE, PAGES, STATIC, MEDIA];
 
 const OFFLINE_URL = "/offline";
-const PRECACHE_URLS = [OFFLINE_URL, "/images/logo.webp", "/icons/icon-192.png", "/icons/icon-512.png", "/legal.css"];
+const PRECACHE_URLS = [OFFLINE_URL, "/app", "/images/logo.webp", "/icons/icon-192.png", "/icons/icon-512.png", "/legal.css"];
 const MAX_PAGES = 20, MAX_MEDIA = 80;
 
 self.addEventListener("install", (event) => {

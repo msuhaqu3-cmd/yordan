@@ -91,6 +91,13 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href={FONTS_HREF} rel="stylesheet" />
+        {/* Installed app (standalone) opens the mobile app UI instead of the website. Runs before first paint. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if((matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)&&location.pathname==='/'){location.replace('/app'+location.search)}}catch(e){}",
+          }}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body>
