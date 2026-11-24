@@ -8,10 +8,10 @@ import { FONTS_HREF, SITE_NAME, SITE_URL, THEME } from "@/lib/site";
 import PwaRegister from "@/components/pwa-register";
 import InstallApp from "@/components/install-app";
 
-const TITLE = "Builders & Decorators North London | Yordan Decorations & Building";
+const TITLE = "Yordan Decorations & Building";
 const desc = (phone: string) =>
   `Insured builders, painters & decorators in North London (N8, Haringey). Renovations, loft conversions, kitchens, bathrooms, plumbing, electrical, HMO maintenance. Free quotes: ${phone}.`;
-const OG_IMG = `${SITE_URL}/images/building-renovation-london.webp`;
+const OG_IMG = `${SITE_URL}/images/og-logo.png`;
 
 const splash: [number, number, number][] = [
   [430, 932, 3],
@@ -64,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: TITLE,
     description:
       "Building, renovation, decorating and maintenance for homeowners, landlords and businesses across London. Fully insured. Free quotes.",
-    images: [{ url: OG_IMG, alt: "Building and renovation work by Yordan Decorations & Building Ltd" }],
+    images: [{ url: OG_IMG, alt: "Yordan Decorations & Building Ltd logo" }],
   },
   twitter: {
     card: "summary_large_image",
