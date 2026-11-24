@@ -23,7 +23,12 @@ const upload = async (cookie, { name = "a.png", data, slot = "app:before", origi
   fd.set("slot", slot); fd.set("file", new Blob([data ?? (await png())]), name);
   return fetch(B + "/api/admin/media", { method: "POST", body: fd, headers: { Origin: origin, ...(cookie ? { Cookie: `${COOKIE}=${cookie}` } : {}) } });
 };
-const enq = (b, h = {}) => fetch(B + "/api/enquiries", { method: "POST", headers: { ...H, ...h }, body: typeof b === "string" ? b : JSON.stringify(b) });
+// Tests reuse one dummy phone number; give each request its own so the per-phone cap only bites where a test wants it to.
+const randPhone = () => "07" + String(Math.floor(Math.random() * 1e9)).padStart(9, "0");
+const enq = (b, h = {}) => {
+  if (b && typeof b === "object" && b.phone === "01234567890") b = { ...b, phone: randPhone() };
+  return fetch(B + "/api/enquiries", { method: "POST", headers: { ...H, ...h }, body: typeof b === "string" ? b : JSON.stringify(b) });
+};
 
 let admin, staff, adminTok, staffTok;
 const MARK = "RT-" + Math.random().toString(36).slice(2, 8);
@@ -143,6 +148,21 @@ test("on Vercel (server started with VERCEL=1) spoofed X-Real-IP / X-Forwarded-F
   await q("truncate rate_events");
 });
 
+test("one phone number cannot create more than 3 enquiries an hour, even from different addresses", async () => {
+  await q("truncate rate_events");
+  const phone = "07700900123";
+  const codes = [];
+  for (let i = 0; i < 5; i++) codes.push((await enq({ ref: `tstphone${String(i).padStart(4, "0")}`, name: MARK + " p", phone }, { "X-Vercel-Forwarded-For": `5.5.5.${i}` })).status);
+  assert.deepEqual(codes, [200, 200, 200, 429, 429]);
+  await q("truncate rate_events");
+});
+test("global ceiling: 300 enquiries an hour in total, then new ones are refused", async () => {
+  await q("truncate rate_events");
+  await q("insert into rate_events(key) select 'enq:all' from generate_series(1,300)");
+  assert.equal((await enq({ ref: "tstglobal001", name: MARK + " g", phone: "01234567890" }, { "X-Vercel-Forwarded-For": "5.5.9.9" })).status, 429);
+  await q("truncate rate_events");
+});
+
 /* ---------- uploads ---------- */
 test("upload: signed-out, foreign origin, bad slot, svg, php, gif, oversize are all rejected", async () => {
   assert.equal((await upload(null)).status, 401);
@@ -201,6 +221,11 @@ test("security headers: admin never cached or framed; public has nosniff/frame/p
   assert.match(a.headers.get("cache-control"), /no-store/); assert.equal(a.headers.get("x-frame-options"), "DENY");
   const p = await get("/");
   assert.equal(p.headers.get("x-content-type-options"), "nosniff"); assert.ok(p.headers.get("permissions-policy"));
+});
+test("Content-Security-Policy is set on public and admin pages and blocks framing, plugins and foreign form posts", async () => {
+  const pub = (await get("/")).headers.get("content-security-policy") || "", adm = (await get("/admin/login")).headers.get("content-security-policy") || "";
+  for (const c of [pub, adm]) { assert.match(c, /object-src 'none'/); assert.match(c, /base-uri 'self'/); assert.match(c, /default-src 'self'/); }
+  assert.match(adm, /frame-ancestors 'none'/); assert.match(adm, /connect-src 'self';/); assert.match(pub, /connect-src 'self' https:\/\/formsubmit\.co/);
 });
 test("CORS: a foreign origin is not granted access", async () => {
   const r = await fetch(B + "/api/enquiries", { method: "OPTIONS", headers: { Origin: "https://evil.example", "Access-Control-Request-Method": "POST" } });

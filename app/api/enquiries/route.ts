@@ -28,7 +28,11 @@ export async function POST(req: Request) {
   const e = parseEnquiry(body);
   if (!e) return NextResponse.json({ ok: false }, { status: 400 });
   try {
+    // Per address, per phone number (one bot reusing a number from many addresses) and a global ceiling that
+    // keeps a distributed flood from filling the database. Real traffic is far below all three.
     if (!(await allow(`enq:${hashKey(await clientIp())}`, 10, 600))) return NextResponse.json({ ok: false }, { status: 429 });
+    if (!(await allow(`enqp:${hashKey(e.phone.replace(/\D/g, ""))}`, 3, 3600))) return NextResponse.json({ ok: false }, { status: 429 });
+    if (!(await allow("enq:all", 300, 3600))) return NextResponse.json({ ok: false }, { status: 429 });
     await createEnquiry(e);
   } catch (err) {
     console.error("enquiry record failed", (err as Error)?.message);

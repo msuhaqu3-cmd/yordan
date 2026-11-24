@@ -25,12 +25,15 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
   const email = str(fd, "email").trim().toLowerCase().slice(0, 120);
   const password = str(fd, "password").slice(0, 200);
   if (!email || !password) return { error: "Enter your email and password." };
-  const ipKey = `ip:${hashKey(await clientIp())}`, emailKey = `em:${hashKey(email)}`;
-  const wait = await lockedFor([ipKey, emailKey]);
+  const ip = hashKey(await clientIp());
+  // Locks are per (email + IP) and per IP, so someone guessing from their own address cannot lock the real owner out.
+  // A much higher per-email cap still stops a guessing attack spread over many addresses.
+  const ipKey = `ip:${ip}`, emailKey = `em:${hashKey(email)}`, pairKey = `emip:${hashKey(email + "|" + ip)}`;
+  const wait = await lockedFor([ipKey, emailKey, pairKey]);
   if (wait > 0) return { error: `Too many attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` };
   // Count this attempt first (atomically). Parallel guesses beyond the limit are refused without being checked.
-  const [ec, ic] = [await reserveAttempt(emailKey, 5, 900, 900), await reserveAttempt(ipKey, 25, 900, 900)];
-  if (ec > 5 || ic > 25) return { error: "Too many attempts. Try again in 15 minute(s)." };
+  const [pc, ec, ic] = [await reserveAttempt(pairKey, 5, 900, 900), await reserveAttempt(emailKey, 40, 900, 900), await reserveAttempt(ipKey, 25, 900, 900)];
+  if (pc > 5 || ec > 40 || ic > 25) return { error: "Too many attempts. Try again in 15 minute(s)." };
   const [u] = await q<User & { password_hash: string; token_version: number }>(
     "select id,email,name,role,active,must_change_password,password_hash,token_version,created_at,last_login_at from users where email=$1", [email]);
   const good = await verifyPassword(password, u ? u.password_hash : await dummyHash());
@@ -38,6 +41,7 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
     await audit(u?.id ?? null, "login_failed", email);
     return { error: "Invalid email or password." };
   }
+  await clearFails(pairKey);
   await clearFails(emailKey);
   await q("update users set last_login_at=now() where id=$1", [u.id]);
   await startSession(u.id, u.token_version);
