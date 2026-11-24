@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { authConfigured, currentUser, endSession, requireAdmin, requireUser, startSession, type User } from "@/lib/auth";
 import { q } from "@/lib/db";
 import { dummyHash, hashPassword, passwordProblem, verifyPassword } from "@/lib/password";
-import { audit, clearFails, clientIp, hashKey, lockedFor, recordFail } from "@/lib/security";
+import { audit, clearFails, clientIp, hashKey, lockedFor, reserveAttempt } from "@/lib/security";
 import { saveSettings, validateSettings } from "@/lib/settings";
 import { deleteEnquiry, saveEnquiry } from "@/lib/enquiries";
 import { VALID_SLOT } from "@/lib/slots";
@@ -28,12 +28,13 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
   const ipKey = `ip:${hashKey(await clientIp())}`, emailKey = `em:${hashKey(email)}`;
   const wait = await lockedFor([ipKey, emailKey]);
   if (wait > 0) return { error: `Too many attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` };
+  // Count this attempt first (atomically). Parallel guesses beyond the limit are refused without being checked.
+  const [ec, ic] = [await reserveAttempt(emailKey, 5, 900, 900), await reserveAttempt(ipKey, 25, 900, 900)];
+  if (ec > 5 || ic > 25) return { error: "Too many attempts. Try again in 15 minute(s)." };
   const [u] = await q<User & { password_hash: string; token_version: number }>(
     "select id,email,name,role,active,must_change_password,password_hash,token_version,created_at,last_login_at from users where email=$1", [email]);
   const good = await verifyPassword(password, u ? u.password_hash : await dummyHash());
   if (!u || !good || !u.active) {
-    await recordFail(emailKey, 5, 900, 900);
-    await recordFail(ipKey, 25, 900, 900);
     await audit(u?.id ?? null, "login_failed", email);
     return { error: "Invalid email or password." };
   }
@@ -56,9 +57,8 @@ export async function changePasswordAction(_: ActionState, fd: FormData): Promis
   const cur = str(fd, "current"), next = str(fd, "next"), again = str(fd, "again");
   const [row] = await q<{ password_hash: string }>("select password_hash from users where id=$1", [me.id]);
   const lock = await lockedFor([`pw:${me.id}`]);
-  if (lock > 0) return { error: "Too many wrong attempts. Try again later." };
+  if (lock > 0 || (await reserveAttempt(`pw:${me.id}`, 5, 900, 900)) > 5) return { error: "Too many wrong attempts. Try again later." };
   if (!(await verifyPassword(cur, row.password_hash))) {
-    await recordFail(`pw:${me.id}`, 5, 900, 900);
     return { error: "Your current password is not correct." };
   }
   if (next !== again) return { error: "The new passwords do not match." };

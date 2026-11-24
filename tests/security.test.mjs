@@ -129,6 +129,20 @@ test("rate limit blocks floods and cannot be bypassed with a spoofed X-Forwarded
   await q("truncate rate_events");
 });
 
+test("rate limit holds under a parallel burst (no race): exactly 10 of 40 are accepted", async () => {
+  await q("truncate rate_events");
+  const res = await Promise.all(Array.from({ length: 40 }, (_, i) => enq({ ref: `tstburst${String(i).padStart(4, "0")}`, name: MARK + " b", phone: "01234567890" }, { "X-Vercel-Forwarded-For": "4.4.4.4" })));
+  assert.equal(res.filter((r) => r.status === 200).length, 10, res.map((r) => r.status).join());
+  await q("truncate rate_events");
+});
+test("on Vercel (server started with VERCEL=1) spoofed X-Real-IP / X-Forwarded-For never create new buckets", { skip: !process.env.TEST_SERVER_VERCEL && "start the server with VERCEL=1 and set TEST_SERVER_VERCEL=1" }, async () => {
+  await q("truncate rate_events");
+  const codes = [];
+  for (let i = 0; i < 12; i++) codes.push((await enq({ ref: `tstreal${String(i).padStart(4, "0")}`, name: MARK + " v", phone: "01234567890" }, { "X-Real-IP": `8.8.${i}.1`, "X-Forwarded-For": `9.9.${i}.1` })).status);
+  assert.equal(codes.filter((c) => c === 429).length, 2, codes.join());
+  await q("truncate rate_events");
+});
+
 /* ---------- uploads ---------- */
 test("upload: signed-out, foreign origin, bad slot, svg, php, gif, oversize are all rejected", async () => {
   assert.equal((await upload(null)).status, 401);
